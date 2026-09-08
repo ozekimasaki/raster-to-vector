@@ -2,7 +2,7 @@
 name: raster-to-vector
 description: Raster画像を観察し、WVRとCFV-Xの理論に基づいて編集可能なSVGを構築・実描画比較・修正する。PNG、JPEG、WebPのロゴ、図版、線画、イラスト、写真のベクター化、トレース、SVG再構成、変換後の隙間や透明度の診断に使用する。ラスター画像の生成・レタッチだけの依頼には使用しない。
 license: GPL-3.0
-compatibility: Requires Python 3.10+. Chromium or CairoSVG for render comparison. CFV-X draft path needs scipy, scikit-image, and OpenCV.
+compatibility: Requires Python 3.10+. Chromium or CairoSVG for render comparison. mosaic-draft pixel/polygon need numpy and Pillow. CFV-X draft and mosaic-draft curve need scipy, scikit-image, and OpenCV.
 metadata:
   author: ozekimasaki
   version: "1.0.0"
@@ -33,6 +33,7 @@ metadata:
 | 状況 | 参照先 |
 |---|---|
 | 隣接面、円弧、穴、接合点、ストローク | [幾何・位相](references/geometry-and-topology.md) |
+| 格子ラベルからの共有境界ドラフト | [mosaic-draft](references/mosaic-draft.md) |
 | 隙間、透明度、重なり、下地、加算 | [被覆と合成](references/coverage-and-compositing.md) |
 | SVGの組み立てと再出力 | [SVG出力](references/svg-output.md) |
 | 誤差を読む、修正を採否する | [品質契約](references/quality-contract.md) |
@@ -81,15 +82,17 @@ python "SKILL_ROOT/scripts/r2v.py" analyze "input.png" --out "work/input"
 
 ### フラットイラスト
 
-色領域と前後関係を整理する。必要なら初期候補を生成する。
+色領域と前後関係を整理する。隣接面があるときは共有境界ドラフトを先に見る。
 
 ```text
+python "SKILL_ROOT/scripts/r2v.py" mosaic-draft "input.png" --out "work/mosaic" --colors 22 --mode polygon
+python "SKILL_ROOT/scripts/r2v.py" mosaic-draft "input.png" --out "work/mosaic" --from-labels "work/p64/labels.npy" --mode pixel
 python "SKILL_ROOT/scripts/r2v.py" cfvx-draft "input.png" --out "work/draft"
 ```
 
+`mosaic-draft` は格子上の共有辺を一度だけ fit する。領域ごとの独立トレースではない。完成出力ではなく `draft-status.json` を読む。
 CFV-Xは素材alphaの切り捨て、小領域除去、輪郭下への膨張を含む。
-共有境界やWVR 2を満たす完成出力ではない。`draft-status.json`を読む。
-既存CFV-Xの `overall: passed` を最終合格として引用しない。
+共有境界やWVR 2を満たす完成出力ではない。既存CFV-Xの `overall: passed` を最終合格として引用しない。
 
 ### 線画
 
@@ -118,6 +121,7 @@ python "SKILL_ROOT/scripts/r2v.py" propose-regions "photo.jpg" --colors 128 --ou
 ## 3. 共有構造を使う
 
 隣接面があるときは [共有グラフ例](examples/shared-boundary.json) を参考にする。
+フラットな色面の初期グラフは `mosaic-draft` が格子ラベルから作る。LLMが意味で分割・結合したあと、正逆は同じ数値を使う。
 境界は一度だけ構築し、左右の面は同じedgeを逆向きに参照する。
 junctionは共有頂点変数。fit後に別々の端点を近づける方式にしない。
 正逆のSVGコマンド生成は同じ数値・精度・transformを使う。

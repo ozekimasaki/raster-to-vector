@@ -35,7 +35,7 @@ npx skills add ozekimasaki/raster-to-vector
 | Python | 3.10+ |
 | Core measurement | `requirements-core.txt` |
 | Render comparison | `requirements-render.txt` |
-| CFV-X draft | `requirements-cfvx.txt` |
+| CFV-X / mosaic-draft curve | `requirements-cfvx.txt` |
 
 ```text
 python -m venv .venv
@@ -84,7 +84,7 @@ No redistribution rights are granted for the input clip art.
 | Path | Contents |
 |---|---|
 | `SKILL.md` | Agent workflow |
-| `references/` | Workflow, geometry, coverage, SVG, quality contract, CLI |
+| `references/` | Workflow, geometry, coverage, SVG, quality contract, CLI, mosaic-draft |
 | `references/originals/` | CFV-X / WVR 1 / WVR 2 source copies |
 | `scripts/` | Measurement and inspection CLI |
 | `vendor/cfvx/` | CFV-X draft path |

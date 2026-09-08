@@ -14,6 +14,7 @@
 - [CFV-X](originals/raster_to_vector_theory_review.md): §3–6 精度・観測、§8–11 輪郭・円弧・共同最適化、§12 画素fit、§14 保証、§18.8 写真。
 - [WVR 1](originals/watertight_vector_reconstruction_spec.md): §3 診断、§6–10 共有境界・端点・書き出し、§11–18 合成と表示条件、§23 受け入れ。
 - [WVR 2](originals/wvr2_coverage_conserving_design.md): §4 加算の条件、§5 SVG候補、§6 セル化、§7–8 積分、§9 寄与率、§16 未実装。
+- mosaic-draft: [作業資料](mosaic-draft.md)。アルゴリズム参照は VTracer `docs/design/mosaic.md`（本体非依存、originals には置かない）。
 
 ## 主張の区別
 
@@ -21,8 +22,9 @@
 導出: 明示したbox filter・非重複・色空間などの条件で成り立つ数式。
 限定実測: experiments/に収録した合成例と数式検算。任意画像の品質証明ではない。
 未実装: 汎用DCEL、円弧arrangement、透明セル分割器、連続Hausdorff上界、精密逆描画。
-追加設計: Skillの画像別ルーティング、補助CLI、保護領域記録、写真の候補比較、停止条件。
+追加設計: Skillの画像別ルーティング、補助CLI、保護領域記録、写真の候補比較、停止条件、ラベルマップ mosaic-draft（VTracer mosaic.md の格子共有境界。VTracer本体は非依存）。
 既存CFV-Xコード: vendor/cfvxへ無変更コピー。WVR 2の完成実装ではない。
+mosaic-draft の `curve` は vendor/cfvx の開路 fit を呼ぶが、vendor 自体は変更しない。
 
 ## 公式Skill仕様
 
