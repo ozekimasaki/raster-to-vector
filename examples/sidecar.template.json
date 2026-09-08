@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "source": {"path": null, "sha256": null},
+  "image_profile": {"kind": "unresolved", "reason": null},
+  "intent": {"mode": "faithful", "strict_vector": true, "preserve_canvas": true, "preserve_background": true},
+  "protected_regions": [],
+  "uncertainties": [],
+  "shapes": [],
+  "shared_graph": {"vertices": {}, "edges": {}, "faces": {}},
+  "render_plan": {"compositing": "source-over", "display_variant": null},
+  "iterations": [],
+  "visual_review": {"status": "indeterminate", "observations": []},
+  "stopping_reason": null
+}

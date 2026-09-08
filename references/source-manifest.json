@@ -1,0 +1,137 @@
+[
+  {
+    "source": "raster_to_vector_review_bundle/raster_to_vector_theory_review.md",
+    "target": "references/originals/raster_to_vector_theory_review.md",
+    "sha256": "c880c14b0116b41682e7e4cd8ea8c2eb3073abd64b6717f84240b021ea69aaf6"
+  },
+  {
+    "source": "watertight_vector_reconstruction_bundle/watertight_vector_reconstruction_spec.md",
+    "target": "references/originals/watertight_vector_reconstruction_spec.md",
+    "sha256": "e3c9f7f756352e218d4d33e4dfedb640df713865047db02ff749554cebce4cc1"
+  },
+  {
+    "source": "wvr2_coverage_conserving_design.md",
+    "target": "references/originals/wvr2_coverage_conserving_design.md",
+    "sha256": "b5925751e20911235e5384502854dec6003d9f0ddb3b8d9a94de746c37abf474"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/cfvx/cli.py",
+    "target": "vendor/cfvx/cli.py",
+    "sha256": "70feb313296883f847f16ccb0f0fd7d0f374d9f81b38e67f2535a70840e7b912"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/cfvx/export.py",
+    "target": "vendor/cfvx/export.py",
+    "sha256": "e700177c31919b3e348dd01affb37dea54fcff4fe014c6f67fdb103af69d7751"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/cfvx/geometry.py",
+    "target": "vendor/cfvx/geometry.py",
+    "sha256": "2eb4c4eb1bc30090931f14cab5c825b24caf9cae4421c645f09baa0309531c9b"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/cfvx/pipeline.py",
+    "target": "vendor/cfvx/pipeline.py",
+    "sha256": "a66636559da6e9b85bfbdd2e24af931882968023abd8856542edfaf4a9cb18d8"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/cfvx/raster.py",
+    "target": "vendor/cfvx/raster.py",
+    "sha256": "e3db339f6b99a0879a847876f735d5158f5745c359dac7b83c3eb3e7f3a5fa34"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/cfvx/types.py",
+    "target": "vendor/cfvx/types.py",
+    "sha256": "f6efc77b20634c96f6d16d80163e54cfa8732bc349f78b3c7c04da32c140ab5d"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/cfvx/verify.py",
+    "target": "vendor/cfvx/verify.py",
+    "sha256": "d46f59109431dd75f33dc0099b17ebfcfee11b9935fb1f49adf19ddd99bd4719"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/cfvx/__init__.py",
+    "target": "vendor/cfvx/__init__.py",
+    "sha256": "0b40c1b3f46f1a15da6d5a85d17f151aeaa8893dd133e8467a0dd09213e8dd8c"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/cfvx/__main__.py",
+    "target": "vendor/cfvx/__main__.py",
+    "sha256": "307299fda7b77d22c64cb51430ec75e5f59d78e9c948786afb3b2544fe45e4b7"
+  },
+  {
+    "source": "verify_math.py",
+    "target": "examples/experiments/wvr2/verify_math.py",
+    "sha256": "860908eab20d795bca051a441c8d3f81403fad1d6da4f9943e740dac134425bf"
+  },
+  {
+    "source": "verify_coverage.py",
+    "target": "examples/experiments/wvr2/verify_coverage.py",
+    "sha256": "acbc1bb5534a41b061e1e6218d57fe2d2c7ed399af618c076fe6b0a06db56d2e"
+  },
+  {
+    "source": "probe_weights.py",
+    "target": "examples/experiments/wvr2/probe_weights.py",
+    "sha256": "246d966f1e104bbdb2cbc079a2b03b706a4c60dd21fff0024d18513b12402821"
+  },
+  {
+    "source": "test_arc_lowering.py",
+    "target": "examples/experiments/wvr2/test_arc_lowering.py",
+    "sha256": "771fdb47c4ba9a3ac46c798991a83f7d968e999f4f446050523dd51b8b8d34e3"
+  },
+  {
+    "source": "watertight_vector_reconstruction_bundle/verify_wvr.py",
+    "target": "examples/experiments/wvr1/verify_wvr.py",
+    "sha256": "3edc4b727f525139502c2fdb2a55757ea2f110999b0eb4b199f2932f2ee14ab8"
+  },
+  {
+    "source": "raster_to_vector_review_bundle/review_checks.py",
+    "target": "examples/experiments/cfvx/review_checks.py",
+    "sha256": "4b812d04ae1c9f039a0d6458c54f2f679eccd7c5a560a819bfbb0eaae09c845e"
+  },
+  {
+    "source": "watertight_vector_reconstruction_bundle/results/fixtures/underlay_wrong.svg",
+    "target": "examples/fixtures/underlay_wrong.svg",
+    "sha256": "848c946e4410b74d443b23319c8c5ef41e727fb71f186c9072a4713ee939630b"
+  },
+  {
+    "source": "watertight_vector_reconstruction_bundle/results/fixtures/base_fill.svg",
+    "target": "examples/fixtures/base_fill.svg",
+    "sha256": "42925e9e31dfc39fd2597fa36254fcacb9500bfc3a085ed98c290758c5f7c713"
+  },
+  {
+    "source": "watertight_vector_reconstruction_bundle/results/fixtures/intentional_gap.svg",
+    "target": "examples/fixtures/intentional_gap.svg",
+    "sha256": "0cb44676103b68bb1b750cd6b30b57b4aa2b728031f0db25eb8bbd925072a9d1"
+  },
+  {
+    "source": "watertight_vector_reconstruction_bundle/results/fixtures/per_shape_opacity_overlap.svg",
+    "target": "examples/fixtures/per_shape_opacity_overlap.svg",
+    "sha256": "d68fa3299898ef44ede84bd55b698d322bc85d62a747529219715c1f3bb332ee"
+  },
+  {
+    "source": "results/fixtures/overlap_raw_plus-lighter.svg",
+    "target": "examples/fixtures/overlap_raw_plus-lighter.svg",
+    "sha256": "76016c131545c3c2ef7d9739f96bd43869ca6e2bd793130306320e19fca4263b"
+  },
+  {
+    "source": "results/fixtures/two_rects_plus-lighter.svg",
+    "target": "examples/fixtures/two_rects_plus-lighter.svg",
+    "sha256": "2a84d325ea2fc97f1f3b6bae1ca3797d70eba9ab872dc165d79a9fa0e480387f"
+  },
+  {
+    "source": "results/fixtures/three_Y_plus-lighter.svg",
+    "target": "examples/fixtures/three_Y_plus-lighter.svg",
+    "sha256": "9168f0206a26183c3cf97b194f24e183203f6aa70cfe5b1b706cab2c0dcf3a44"
+  },
+  {
+    "source": "results/fixtures/three_alpha_plus-lighter.svg",
+    "target": "examples/fixtures/three_alpha_plus-lighter.svg",
+    "sha256": "0349c37ea5d8250ffd7491bf654607cffc0847af94c261fb8398f697d5222f21"
+  },
+  {
+    "source": "results/fixtures/intentional_slit_normal.svg",
+    "target": "examples/fixtures/intentional_slit_normal.svg",
+    "sha256": "dea9eaa88cb44be25c087036d8563a006d2d974d5a7085d45c3aa2fffdf2b45c"
+  }
+]

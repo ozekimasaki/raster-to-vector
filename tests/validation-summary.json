@@ -1,0 +1,53 @@
+{
+  "date": "2026-09-08",
+  "python": "3.14.2",
+  "chromium": "151.0.7922.34",
+  "cairosvg": "2.9.0",
+  "unit_tests": 22,
+  "matrix_render_count": 96,
+  "inline_img_max_difference": 0.0,
+  "box_oracle": {
+    "scope": "Rectangles, encoded sRGB, analytical box coverage, tested finite profiles only",
+    "within_threshold_count": 16,
+    "count": 96,
+    "max_alpha_error": 0.49607843137254903,
+    "max_color_error": 0.34509803921568627
+  },
+  "numerical": {
+    "cfvx": {
+      "exit_code": 0
+    },
+    "wvr2": {
+      "exit_code": 0
+    },
+    "wvr1": {
+      "checks": 12
+    }
+  },
+  "negative_assertions": "passed",
+  "source_copies_verified": 27,
+  "observations": {
+    "logo": [
+      "丸い外形と中央の透明な穴を保持。Pillow参照とChromiumのAA差が輪郭に残る。"
+    ],
+    "line": [
+      "開いたジグザグ線の構造を保持。線端と折り返し付近にPillowとSVGの幅・joinの差が残る。"
+    ],
+    "character": [
+      "CFV-Xドラフト。文字の輪郭、髪のハイライト、服の線に欠け・隙間・形の差が残る。",
+      "全体のキャラクターは判別できるが、忠実変換の完成例とはしない。"
+    ],
+    "photo": [
+      "128色候補は32色より平均誤差が減少。顔・髪・背景の陰影と輪郭に段差が残る。",
+      "最大色差は色数に対して単調減少しない。全不透明のIoU=1は品質判定に使えない。",
+      "共有グリッド境界による測定用候補。gradientや自由曲線による仕上げを実証したものではない。"
+    ]
+  },
+  "not_verified": [
+    "Live Claude skill selection/execution",
+    "All models",
+    "Other browsers/editors",
+    "General topology or continuous error certificates",
+    "Photorealistic gradient reconstruction"
+  ]
+}

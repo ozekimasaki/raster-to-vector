@@ -1,0 +1,3 @@
+-r requirements-core.txt
+playwright>=1.57,<2
+CairoSVG>=2.8.2,<3

@@ -1,0 +1,19 @@
+{
+  "description": "Two rectangular faces. Edge divider is defined once; negative direction traverses end to start. This is data, not a DCEL implementation.",
+  "vertices": {"a": [0,0], "b": [32,0], "c": [64,0], "d": [64,64], "e": [32,64], "f": [0,64]},
+  "edges": {
+    "ab": {"kind":"line","start":"a","end":"b"},
+    "bc": {"kind":"line","start":"b","end":"c"},
+    "cd": {"kind":"line","start":"c","end":"d"},
+    "de": {"kind":"line","start":"d","end":"e"},
+    "ef": {"kind":"line","start":"e","end":"f"},
+    "fa": {"kind":"line","start":"f","end":"a"},
+    "divider": {"kind":"line","start":"b","end":"e"}
+  },
+  "faces": {
+    "left": {"loop":[["ab",1],["divider",1],["ef",1],["fa",1]],"fill":"#c4354d"},
+    "right": {"loop":[["bc",1],["cd",1],["de",1],["divider",-1]],"fill":"#2469c8"}
+  },
+  "holes": [],
+  "unresolved": []
+}
