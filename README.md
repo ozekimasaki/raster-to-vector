@@ -1,6 +1,8 @@
 # raster-to-vector
 
-[![skills.sh](https://skills.sh/b/ozekimasaki/raster-to-vector)](https://skills.sh/ozekimasaki/raster-to-vector)
+[![Validate](https://github.com/ozekimasaki/raster-to-vector/actions/workflows/validate.yml/badge.svg)](https://github.com/ozekimasaki/raster-to-vector/actions/workflows/validate.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Agent Skills](https://img.shields.io/badge/spec-agentskills.io-6366f1)](https://agentskills.io/specification)
 
 Raster画像を観察し、WVR と CFV-X の理論に基づいて編集可能な SVG を構築する Agent Skill。
 
@@ -65,6 +67,26 @@ python "SKILL_ROOT/scripts/r2v.py" check "input.png" --svg "result.svg" --out "w
 
 詳細は [SKILL.md](SKILL.md) と [実行環境とCLI](references/runtime-and-cli.md) を読む。
 
+## テスト稼働
+
+2026-09-08、フラットイラスト（フクロモモンガのクリップアート、1024×1024、不透明な白キャンバス）を Chromium 152 で実描画比較した。
+
+行は白・黒・有彩色背景、列は原画像・SVG 実描画・4倍差分。
+
+![フラットイラストの原画像・SVG実描画・差分比較](_assets/glider-clipart.comparison.png)
+
+| 項目 | 結果 |
+|---|---|
+| 画像種別 | フラットイラスト（少数の塗り、丸い部品、JPEG/AA の粒） |
+| 採用反復 | `01`（`00` はクリーム面の欠け、`02` は目の楕円化で悪化） |
+| SVG | 29,600 bytes、path 8、circle 6、区間 1,502 |
+| 描画 | Chromium 152.0.7977.82、source-over、inline |
+| premul RGB MAE / RMSE | 0.01014 / 0.03270 |
+| alpha 欠損・過剰 | なし |
+| 品質判定 | indeterminate（万能閾値は置かない） |
+
+残差の主因は、画素化された目とクリーム面の AA に対する滑らかな円、枝の木目を単色に潰したこと。不透明キャンバスでは silhouette IoU=1 でも形の一致を意味しない。入力クリップアートの再配布権は付与しない。
+
 ## 収録内容
 
 | パス | 内容 |
@@ -76,8 +98,9 @@ python "SKILL_ROOT/scripts/r2v.py" check "input.png" --svg "result.svg" --out "w
 | `vendor/cfvx/` | 既存 CFV-X の任意ドラフト経路 |
 | `examples/` | sidecar テンプレート、負例 SVG、実験コード |
 | `tests/` | 単体・受け入れ試験と検証記録 |
+| `_assets/` | README 用の比較画像（`npx skills add` では除外） |
 
-`npx skills add` は `README.md` を除いてこのフォルダをコピーする。
+`npx skills add` は `README.md` と `_` 始まりのパスを除いてこのフォルダをコピーする。
 
 ## できること / しないこと
 
@@ -102,6 +125,6 @@ Chromium と Shapely が必要な受け入れ試験は `tests/acceptance.py`。�
 本文とコードは [MIT License](LICENSE)。
 
 - `examples/inputs/astronaut-256.png` は NASA / scikit-image の public domain 画像
-- `examples/inputs/character.png` はユーザー提供フィクスチャで、MIT の対象外
+- `examples/inputs/character.png` と `_assets/glider-clipart.comparison.png` はユーザー提供フィクスチャで、MIT の対象外
 
 出典の詳細は [examples/inputs/attribution.md](examples/inputs/attribution.md) と [references/source-map.md](references/source-map.md)。
