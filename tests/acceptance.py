@@ -45,6 +45,14 @@ def synthesize(out):
     d.line([(16*s,96*s),(48*s,32*s),(80*s,96*s),(112*s,32*s)],fill='#232338',width=4*s)
     im.resize((n,n),Image.Resampling.BOX).save(out/'line.png')
     svg_file(out/'line.svg','<path d="M16 96L48 32L80 96L112 32" fill="none" stroke="#232338" stroke-width="4" stroke-linejoin="bevel"/>',n)
+    ill=Image.new('RGBA',(n,n),(0,0,0,0)); di=ImageDraw.Draw(ill)
+    di.ellipse((24,36,104,120),fill='#3d7ea6')
+    di.ellipse((40,12,88,68),fill='#f2d7b6')
+    di.ellipse((50,30,62,42),fill='#2a2a2a')
+    di.ellipse((66,30,78,42),fill='#2a2a2a')
+    di.polygon([(52,50),(76,50),(64,62)],fill='#c45c5c')
+    di.rectangle((46,74,82,102),fill='#e8c547')
+    ill.save(out/'illustration.png')
 
 
 def photo_candidate(labels, palette, path):
@@ -138,7 +146,7 @@ def matrix(out):
 
 
 def main():
-    p=argparse.ArgumentParser(); p.add_argument('--out',required=True,type=Path); p.add_argument('--matrix',action='store_true'); p.add_argument('--matrix-only',action='store_true'); p.add_argument('--reuse-character-draft',action='store_true'); args=p.parse_args()
+    p=argparse.ArgumentParser(); p.add_argument('--out',required=True,type=Path); p.add_argument('--matrix',action='store_true'); p.add_argument('--matrix-only',action='store_true'); p.add_argument('--reuse-illustration-draft',action='store_true'); args=p.parse_args()
     out=args.out.resolve(); out.mkdir(parents=True,exist_ok=True)
     if args.matrix_only: print(json.dumps(matrix(out/'matrix'))); return
     summary={'numerical':numerical(out),'cases':{}}
@@ -151,12 +159,12 @@ def main():
         render(svg,out/name/'cairo','cairosvg')
         summary['cases'][name]=report['comparison']['metrics']
         print(name+' complete',flush=True)
-    char=ROOT/'examples/inputs/character.png'
-    analyze(char,out/'character/input')
-    draft=json.loads((out/'character/draft/draft-status.json').read_text(encoding='utf-8')) if args.reuse_character_draft else cli('cfvx-draft',char,'--out',out/'character/draft')
-    if not draft.get('candidate_exists'): raise RuntimeError('Character draft unavailable')
-    report=cli('check',char,'--svg',out/'character/draft/draft.svg','--renderer','chromium','--out',out/'character/check')
-    summary['cases']['character']=report['comparison']['metrics']; print('character complete',flush=True)
+    ill=out/'synthetic/illustration.png'
+    analyze(ill,out/'illustration/input')
+    draft=json.loads((out/'illustration/draft/draft-status.json').read_text(encoding='utf-8')) if args.reuse_illustration_draft else cli('cfvx-draft',ill,'--out',out/'illustration/draft')
+    if not draft.get('candidate_exists'): raise RuntimeError('Illustration draft unavailable')
+    report=cli('check',ill,'--svg',out/'illustration/draft/draft.svg','--renderer','chromium','--out',out/'illustration/check')
+    summary['cases']['illustration']=report['comparison']['metrics']; print('illustration complete',flush=True)
     photo=ROOT/'examples/inputs/astronaut-256.png'
     analyze(photo,out/'photo/input'); candidates=[]
     for colors in (32,64,128):
