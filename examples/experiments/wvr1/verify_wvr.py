@@ -144,6 +144,19 @@ def analytic_checks() -> list[dict]:
           max_color_error=float(np.abs(under-ideal).max()))
     correct = b*cb + (1-b)*(a*ca + (1-a)*ca)
     check('back_paint_underlay_constant_two_face_case', np.allclose(correct, ideal))
+    winner_back = b*cb + (1-b)*ca
+    check('crisp_underlay_winner_back_matches_ideal', np.allclose(winner_back, ideal))
+    winner_front = b*cb + (1-b)*a*ca + (1-b)*(1-a)*cb
+    check('crisp_underlay_winner_front_bias', np.allclose(winner_front - ideal, a*b*(cb-ca)),
+          max_color_error=float(np.abs(winner_front-ideal).max()))
+    sil_cov = .5
+    sil_after_opaque = sil_cov*1 + (1-sil_cov)*1
+    check('crisp_silhouette_center_inside_kills_aa', sil_after_opaque == 1 and sil_cov == .5,
+          result_alpha=sil_after_opaque, coverage=sil_cov)
+    over1 = 1 - a*b
+    over2 = a + (1-a)*over1
+    over3 = b + (1-b)*over2
+    check('crisp_ignored_double_over_not_partition', abs(over3-1) > .05, alpha=float(over3))
     transparent_overlap = .5 + .5*(1-.5)
     check('opacity_overlap_not_group_opacity', transparent_overlap == .75,
           per_shape_alpha=transparent_overlap, uniform_group_alpha=.5)

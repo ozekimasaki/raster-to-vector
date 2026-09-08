@@ -26,7 +26,10 @@ analyze→目視→32/64/128色候補→重要領域と陰影を選択→パス/
 | overlap_raw_plus-lighter.svg | 本当の半透明overlapへADDを適用した誤り |
 | intentional_gap.svg / intentional_slit_normal.svg | 意図された空白を穴埋めしてはいけない |
 | base_fill.svg | 条件を満たす矩形・一定paintの対照例。万能修復ではない |
+| two_rects_normal.svg | 隣接矩形の通常source-over。内部のalpha欠損の基準 |
 | two_rects_plus-lighter.svg | 非重複加算の小さな対照例。全描画器対応を意味しない |
+| two_rects_base_fill.svg | 同じ矩形への背面色下地。二面・定色の対照 |
+| two_rects_crisp_aa.svg | crispEdges下地＋通常AA。表示専用候補。外形AAは残るとは限らない |
 
 原文の集計にある530描画測定等は全件成功数ではない。
 実験は examples/experiments/。任意SVGの修復器として呼び出さない。

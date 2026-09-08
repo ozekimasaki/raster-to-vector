@@ -30,6 +30,16 @@ result.svgにcanonical形状を残す。renderer固有調整を追加したらre
 sidecarに元edge/shapeとの対応、調整理由、追加誤差、対象条件を保存する。
 表示版が全SVGビューアで同じとは説明しない。
 
+表示版の継ぎ目対策は次の順で試す。構造版へ描画ヒントや二重パスを入れない。
+
+1. 非重複の不透明クラスタなら、isolated `plus-lighter` を Chromium で測る。
+2. 二面・定色なら、背面色の base fill または directed underlap。
+3. 同じ paint の隣接面は union。
+4. plus-lighter が使えない全面不透明キャンバスに限り、同じパスの `shape-rendering:crispEdges` 下地＋通常AA重ねを候補にする。外形・穴のAAが壊れたら不採用。
+
+`use` による一回定義は同梱検査の外。表示版を `check` するならパスを二重化する。
+crisp 下地と plus-lighter は併用しない。半透明面を二重に描かない。
+
 ## 確認の境界
 
 inspect-svgはXML、許可要素、参照、有限数値、path文法を検査する。

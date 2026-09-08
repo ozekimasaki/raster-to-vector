@@ -139,6 +139,7 @@ junctionは共有頂点変数。fit後に別々の端点を近づける方式に
 `plus-lighter`を使う場合は [適用条件](references/coverage-and-compositing.md) を読む。
 非重複の面、正しい素材alpha、isolation、対象経路での実測を必要とする。
 半透明の実overlapに直接ADDしない。総alphaを1に正規化しない。
+`crispEdges` 下地＋通常AA重ねは表示専用の後補。外形のAAを壊し、ヒント依存なので plus-lighter より先に使わない。
 構造版を残し、表示専用の調整は `result.display.svg` に分ける。
 
 ## 5. 最終SVGを実描画する

@@ -96,6 +96,12 @@ class Helpers(unittest.TestCase):
         p=self.svg('<defs><linearGradient id="g"><stop offset="0" stop-color="#fff"/></linearGradient><clipPath id="c"><circle cx="8" cy="8" r="5"/></clipPath></defs><rect width="16" height="16" fill="url(#g)" clip-path="url(#c)"/>')
         self.assertEqual(inspect(p)[0]['status'],'passed')
 
+    def test_crisp_aa_fixture_inspects_without_use(self):
+        for name in ('two_rects_normal','two_rects_base_fill','two_rects_crisp_aa'):
+            status=inspect(ROOT/f'examples/fixtures/{name}.svg')[0]['status']
+            self.assertEqual(status,'passed',name)
+        self.assertEqual(inspect(self.svg('<defs><g id="faces"><rect width="8" height="8"/></g></defs><use href="#faces"/>'))[0]['status'],'failed')
+
     def test_inert_cfvx_metadata(self):
         p=self.svg('<g data-cfvx-role="fill"><path d="M0 0L1 1Z"/></g>')
         self.assertEqual(inspect(p)[0]['status'],'passed')
