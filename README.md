@@ -1,5 +1,7 @@
 # raster-to-vector
 
+[![skills.sh](https://skills.sh/b/ozekimasaki/raster-to-vector)](https://skills.sh/ozekimasaki/raster-to-vector)
+
 Raster画像を観察し、WVR と CFV-X の理論に基づいて編集可能な SVG を構築する Agent Skill。
 
 自動変換器を一度走らせて終わりにはしない。元画像と最終 SVG の実描画を見比べ、隙間・透明度・外形を局所修正する。
@@ -8,7 +10,25 @@ Raster画像を観察し、WVR と CFV-X の理論に基づいて編集可能な
 
 ## インストール
 
-Skill フォルダごと配置する。パスは絶対パスで指定する。
+```text
+npx skills add ozekimasaki/raster-to-vector
+```
+
+特定のエージェントだけに入れる場合:
+
+```text
+npx skills add ozekimasaki/raster-to-vector -g -a cursor -y
+npx skills add ozekimasaki/raster-to-vector -g -a claude-code -y
+npx skills add ozekimasaki/raster-to-vector -g -a codex -y
+```
+
+入っている Skill を確認する:
+
+```text
+npx skills add ozekimasaki/raster-to-vector --list
+```
+
+`npx skills` は Cursor、Claude Code、Codex ほか対応エージェントへ配置する。手動コピーや ZIP アップロードもできる。
 
 | 環境 | 配置先 |
 |---|---|
@@ -16,16 +36,6 @@ Skill フォルダごと配置する。パスは絶対パスで指定する。
 | Claude Code | `~/.claude/skills/raster-to-vector/` または `.claude/skills/` |
 | Codex | `~/.codex/skills/raster-to-vector/` |
 | claude.ai | このフォルダを最上位に持つ ZIP をアップロード |
-
-```text
-git clone https://github.com/ozekimasaki/raster-to-vector.git ~/.cursor/skills/raster-to-vector
-```
-
-Windows の場合:
-
-```text
-git clone https://github.com/ozekimasaki/raster-to-vector.git "%USERPROFILE%\.cursor\skills\raster-to-vector"
-```
 
 ## 必要なもの
 
@@ -66,6 +76,8 @@ python "SKILL_ROOT/scripts/r2v.py" check "input.png" --svg "result.svg" --out "w
 | `vendor/cfvx/` | 既存 CFV-X の任意ドラフト経路 |
 | `examples/` | sidecar テンプレート、負例 SVG、実験コード |
 | `tests/` | 単体・受け入れ試験と検証記録 |
+
+`npx skills add` は `README.md` を除いてこのフォルダをコピーする。
 
 ## できること / しないこと
 

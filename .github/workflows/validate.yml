@@ -1,0 +1,58 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          set -euo pipefail
+          head -1 SKILL.md | grep -q '^---$' || { echo "::error::Missing opening frontmatter delimiter"; exit 1; }
+          tail -n +2 SKILL.md | grep -q '^---$' || { echo "::error::Missing closing frontmatter delimiter"; exit 1; }
+          FM=$(sed -n '2,/^---$/p' SKILL.md | head -n -1)
+          echo "$FM" | grep -q '^name:' || { echo "::error::Missing 'name' field"; exit 1; }
+          echo "$FM" | grep -q '^description:' || { echo "::error::Missing 'description' field"; exit 1; }
+          NAME=$(echo "$FM" | grep '^name:' | sed 's/^name:[[:space:]]*//')
+          if ! echo "$NAME" | grep -qE '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'; then
+            echo "::error::name '$NAME' must be kebab-case"
+            exit 1
+          fi
+          if echo "$NAME" | grep -q -- '--'; then
+            echo "::error::name '$NAME' must not contain consecutive hyphens"
+            exit 1
+          fi
+          if [ ${#NAME} -gt 64 ]; then
+            echo "::error::name '$NAME' exceeds 64 character limit"
+            exit 1
+          fi
+          if [ "$NAME" != "raster-to-vector" ]; then
+            echo "::error::name '$NAME' must match the skill directory"
+            exit 1
+          fi
+          echo "Frontmatter valid"
+
+      - name: Check SKILL.md reference links
+        run: |
+          set -euo pipefail
+          BODY_START=$(grep -n '^---$' SKILL.md | sed -n '2p' | cut -d: -f1)
+          LINKS=$(tail -n +"$BODY_START" SKILL.md \
+            | sed -n 's/.*](\([^)]*\)).*/\1/p' \
+            | grep -v '^http' \
+            | grep -v '^#' || true)
+          for path in $LINKS; do
+            if [ ! -e "$path" ]; then
+              echo "::error::SKILL.md links to '$path' but file does not exist"
+              exit 1
+            fi
+          done
+          echo "Reference links valid"

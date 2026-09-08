@@ -63,7 +63,7 @@ cfvx-draftはドラフトが残った場合もdraft-status.jsonのprocess_exit�
 
 ## 配布
 
-Claude Code: このフォルダを~/.claude/skills/またはプロジェクトの.claude/skills/へ配置。
-Codex: ~/.codex/skills/へ配置。コピー後の検出は対象製品で確認する。
+推奨は `npx skills add ozekimasaki/raster-to-vector`。Cursor / Claude Code / Codex ほか対応エージェントへ配置する。
+手動配置も可。Claude Code: ~/.claude/skills/またはプロジェクトの.claude/skills/。Codex: ~/.codex/skills/。
 claude.ai: Skillフォルダを最上位に持つZIPをアップロード。依存が実行環境にあるかは別途確認する。
 Skillの仕様互換と実際の依存・描画器の利用可否を区別する。自動アップロードは行わない。
