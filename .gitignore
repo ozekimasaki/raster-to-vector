@@ -11,6 +11,14 @@ work/
 tmp/
 *.tmp
 
+# Local user inputs at repo root (not for publication)
+/sample.png
+/sample_02.jpeg
+/sample_*.png
+/sample_*.jpeg
+/sample_*.jpg
+/sample_*.webp
+
 .env
 .env.*
 !.env.example
