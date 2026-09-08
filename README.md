@@ -73,7 +73,7 @@ python "SKILL_ROOT/scripts/r2v.py" check "input.png" --svg "result.svg" --out "w
 
 行は白・黒・有彩色背景、列は原画像・SVG 実描画・4倍差分。
 
-![フラットイラストの原画像・SVG実描画・差分比較](_assets/glider-clipart.comparison.png)
+![フラットイラストの原画像・SVG実描画・差分比較](_assets/glider-clipart.comparison.webp)
 
 | 項目 | 結果 |
 |---|---|
@@ -125,6 +125,6 @@ Chromium と Shapely が必要な受け入れ試験は `tests/acceptance.py`。�
 本文とコードは [GNU GPL-3.0](LICENSE)。改変して公開する場合は、同じ GPL-3.0 で公開する必要がある。
 
 - `examples/inputs/astronaut-256.png` は NASA / scikit-image の public domain 画像
-- `examples/inputs/character.png` と `_assets/glider-clipart.comparison.png` はユーザー提供フィクスチャで、GPL の対象外
+- `examples/inputs/character.png` と `_assets/glider-clipart.comparison.webp` はユーザー提供フィクスチャで、GPL の対象外
 
 出典の詳細は [examples/inputs/attribution.md](examples/inputs/attribution.md) と [references/source-map.md](references/source-map.md)。

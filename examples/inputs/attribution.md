@@ -11,3 +11,6 @@ character.png: ユーザー提供のraster_to_vector_review_bundle/Gy4O99ybIAAe0
 
 logo/line入力はtests/acceptance.pyでPillowにより合成する。SVGのレンダラーと別のforward modelを使う。
 合成例は実画像の性能保証ではなく、処理経路と指標の検査用。
+
+_assets/glider-clipart.comparison.webp: ユーザー提供のフクロモモンガ・クリップアートを入力したテスト稼働の比較パネル。
+README掲載用。第三者への配布権利を新たに付与するものではない。
