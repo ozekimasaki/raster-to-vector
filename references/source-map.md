@@ -37,6 +37,6 @@
 experiments/の各コードは元の合成実験で、任意SVG入力のツールではない。
 再実行時は作業フォルダへコピーし、そこへ出力する。review_checks.pyは自分の隣に結果を書く。
 古いハーネスの--no-sandboxは外部SVG処理へ流用しない。同梱r2vの描画経路は別実装。
-本文とコードの公開ライセンスはリポジトリ直下の LICENSE（MIT）。
-`examples/inputs/character.png` はユーザー提供フィクスチャで MIT の対象外。
+本文とコードの公開ライセンスはリポジトリ直下の LICENSE（GPL-3.0）。
+`examples/inputs/character.png` はユーザー提供フィクスチャで GPL の対象外。
 `examples/inputs/astronaut-256.png` は NASA / scikit-image の public domain 画像。

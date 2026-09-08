@@ -1,7 +1,7 @@
 # raster-to-vector
 
 [![Validate](https://github.com/ozekimasaki/raster-to-vector/actions/workflows/validate.yml/badge.svg)](https://github.com/ozekimasaki/raster-to-vector/actions/workflows/validate.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/spec-agentskills.io-6366f1)](https://agentskills.io/specification)
 
 Raster画像を観察し、WVR と CFV-X の理論に基づいて編集可能な SVG を構築する Agent Skill。
@@ -122,9 +122,9 @@ Chromium と Shapely が必要な受け入れ試験は `tests/acceptance.py`。�
 
 ## ライセンス
 
-本文とコードは [MIT License](LICENSE)。
+本文とコードは [GNU GPL-3.0](LICENSE)。改変して公開する場合は、同じ GPL-3.0 で公開する必要がある。
 
 - `examples/inputs/astronaut-256.png` は NASA / scikit-image の public domain 画像
-- `examples/inputs/character.png` と `_assets/glider-clipart.comparison.png` はユーザー提供フィクスチャで、MIT の対象外
+- `examples/inputs/character.png` と `_assets/glider-clipart.comparison.png` はユーザー提供フィクスチャで、GPL の対象外
 
 出典の詳細は [examples/inputs/attribution.md](examples/inputs/attribution.md) と [references/source-map.md](references/source-map.md)。

@@ -1,7 +1,7 @@
 ---
 name: raster-to-vector
 description: Raster画像を観察し、WVRとCFV-Xの理論に基づいて編集可能なSVGを構築・実描画比較・修正する。PNG、JPEG、WebPのロゴ、図版、線画、イラスト、写真のベクター化、トレース、SVG再構成、変換後の隙間や透明度の診断に使用する。ラスター画像の生成・レタッチだけの依頼には使用しない。
-license: MIT
+license: GPL-3.0
 compatibility: Requires Python 3.10+. Chromium or CairoSVG for render comparison. CFV-X draft path needs scipy, scikit-image, and OpenCV.
 metadata:
   author: ozekimasaki
