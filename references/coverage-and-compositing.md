@@ -59,9 +59,44 @@ gradient stop、非線形色変換、位置依存alphaの積は追加の分割�
 4. 非重複partitionだけ、各要素へ `mix-blend-mode:plus-lighter`、親へ `isolation:isolate` を試す。
 5. 加算グループに不透明背景を入れない。外部背景との合成は通常の一回。
 6. 白・黒・有彩色・透明、0.75/1/1.5倍、位相0/0.5px、inline/imgで検査する。
+7. plus-lighterが使えない全面不透明キャンバスに限り、同じパスの crispEdges 下地＋通常AAを表示版だけで試す。外形・穴が悪化したら戻す。
 
 `CSS.supports()`だけでは対応証明にならない。CairoのADD能力とCairoSVGのCSS解釈は別。
 加算経路を実描画できない場合は未検証。見た目だけ似る別blendへ置き換えない。
+
+## 自色下地と crispEdges 二重描画
+
+不透明な隣接面の 25% 漏れを、ページ背景ではなく隣面の色で埋める発想は、WVR 1 §12.3 の正しい色の base fill の一般化である。
+
+表示専用の形:
+
+```svg
+<g shape-rendering="crispEdges"><!-- 同じ不透明パス --></g>
+<g><!-- 同じパスを通常AAで重ねる --></g>
+```
+
+`<use>` でパスを一度だけ書く書き方もあるが、同梱 `inspect-svg` は `use` を拒否する。`check` する表示版はパスを二重化する。
+
+成立しない条件:
+
+- 外形と穴。画素中心が内側なら下地が不透明になり、同じ色の AA は alpha を減らせない。
+- `crispEdges` はヒント。AA が切れない描画器では二重 source-over になり、partition にならない。
+- 半透明面の二度描き。素材 alpha が濃くなる。
+- 三叉点。勝者は1色で、plus-lighter のような加算にはならない。
+- 誤色の一枚下地。alpha が直っても色が `ab(CU-CA)` ずれる。
+
+採否は内部継ぎ目と外形を分けて測る。対照は [two_rects_normal.svg](../examples/fixtures/two_rects_normal.svg)、[two_rects_plus-lighter.svg](../examples/fixtures/two_rects_plus-lighter.svg)、[two_rects_base_fill.svg](../examples/fixtures/two_rects_base_fill.svg)、[two_rects_crisp_aa.svg](../examples/fixtures/two_rects_crisp_aa.svg)。測定は `examples/experiments/wvr2/probe_crisp_aa.py`。
+
+Chromium 151、倍率 0.75/1/1.5、位相 0/0.5px、背景4種の最大値（解析的 box coverage、encoded sRGB）。CairoSVG はこの環境では未測定。
+
+| 手法 | 内部 alpha 欠損 | 内部色差 | 外周 alpha 過剰 |
+|---|---:|---:|---:|
+| 通常 source-over | 0.251 | 0.197 | 0.249 |
+| isolated plus-lighter | 0.004 | 0.005 | 0.496 |
+| 背面色 base fill | 0 | 0.004 | 0.499 |
+| crispEdges + AA | 0 | 0.157 | 0.750 |
+
+内部の 0.157 は二面 50/50 での `ab|CB-CA|`（約 40/255）に一致し、勝者面への色寄りである。外周 0.75 は被覆 0.25 の画素が不透明になった場合と一致する。plus-lighter と base fill の外周差は、既存の box 基準残差と同型で、crisp+AA の外形破壊とは別である。全描画器・全倍率の保証ではない。
 
 ## 再配色検査
 
