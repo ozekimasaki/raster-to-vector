@@ -39,5 +39,4 @@ experiments/の各コードは元の合成実験で、任意SVG入力のツー�
 `probe_crisp_aa.py` は隣接矩形の cutout / plus-lighter / base fill / crispEdges+AA を Chromium で比べる。全描画器保証ではない。
 古いハーネスの--no-sandboxは外部SVG処理へ流用しない。同梱r2vの描画経路は別実装。
 本文とコードの公開ライセンスはリポジトリ直下の LICENSE（GPL-3.0）。
-`examples/inputs/character.png` はユーザー提供フィクスチャで GPL の対象外。
 `examples/inputs/astronaut-256.png` は NASA / scikit-image の public domain 画像。
