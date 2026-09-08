@@ -3,7 +3,7 @@
   "python": "3.14.2",
   "chromium": "151.0.7922.34",
   "cairosvg": "2.9.0",
-  "unit_tests": 22,
+  "unit_tests": 34,
   "matrix_render_count": 96,
   "inline_img_max_difference": 0.0,
   "box_oracle": {

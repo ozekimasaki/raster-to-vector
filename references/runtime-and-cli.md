@@ -23,6 +23,8 @@ Claude APIのように追加導入できない環境では、既存ツールで�
 python scripts/r2v.py analyze input.png --out work/input
 python scripts/r2v.py analyze animation.webp --frame 0 --out work/frame0
 python scripts/r2v.py propose-regions input.png --colors 64 --out work/p64
+python scripts/r2v.py mosaic-draft input.png --out work/mosaic --colors 22 --mode polygon
+python scripts/r2v.py mosaic-draft input.png --out work/mosaic --from-labels work/p64/labels.npy --mode pixel
 python scripts/r2v.py cfvx-draft input.png --out work/draft --colors 22 --tolerance 0.65
 python scripts/r2v.py inspect-svg candidate.svg --out work/structure.json
 python scripts/r2v.py render candidate.svg --renderer chromium --out work/render
@@ -42,6 +44,7 @@ compareは同寸法を要求。元rasterの拡大補間を高倍率の正解と�
 analyze: normalized.png / thumbnail.png / alpha.png / analysis.json。
 propose-regions: regions.png / labels.npy / alpha.png / palette.json。
 labelsは色ラベルで、透明画素=-1。連結成分やfaceのIDではない。np.loadはallow_pickle=False。
+mosaic-draft: candidate.svg / shared-boundary.json / draft-status.json。`--from-labels` が無ければ propose-regions と同じ色ラベルを `--out` へ書く。`--mode pixel` は面の塗り戻し一致を status に残す。完成証明ではない。
 render: render.png / render.json。
 compare: comparison.png / comparison-{white,black,color}.png / difference.png / alpha-difference.png /
 worst-crop.png / comparison.json。比較パネルは行が白・黒・有彩色、列が原画像・描画・4倍差分。
@@ -58,6 +61,7 @@ check後にSVGを変えた場合は再checkする。
 
 exit 0は実行成功。2は入力・構造拒否、3は依存・実行機能不足。
 cfvx-draftはドラフトが残った場合もdraft-status.jsonのprocess_exitとcandidate_existsを読む。
+mosaic-draftも candidate_exists と draft_only を読む。area_matches_pixels は格子面積の一致であり、描画忠実度ではない。
 描画workerは45秒、CFV-Xは180秒で停止する。大量入力は明示的に分割する。
 安全なSVGサブセットの範囲はsvg-output.mdを読む。未対応の正規SVGを規格違反と呼ばない。
 

@@ -35,7 +35,7 @@ npx skills add ozekimasaki/raster-to-vector
 | Python | 3.10+ |
 | 核心测量 | `requirements-core.txt` |
 | 实绘比较 | `requirements-render.txt` |
-| CFV-X 草稿 | `requirements-cfvx.txt` |
+| CFV-X / mosaic-draft curve | `requirements-cfvx.txt` |
 
 ```text
 python -m venv .venv
@@ -84,7 +84,7 @@ python "SKILL_ROOT/scripts/r2v.py" check "input.png" --svg "result.svg" --out "w
 | 路径 | 内容 |
 |---|---|
 | `SKILL.md` | 面向代理的流程 |
-| `references/` | 作业步骤、几何、覆盖、SVG、质量约定、CLI |
+| `references/` | 作业步骤、几何、覆盖、SVG、质量约定、CLI、mosaic-draft |
 | `references/originals/` | CFV-X / WVR 1 / WVR 2 原文副本 |
 | `scripts/` | 测量与检查 CLI |
 | `vendor/cfvx/` | CFV-X 草稿路径 |

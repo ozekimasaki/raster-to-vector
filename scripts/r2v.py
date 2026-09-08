@@ -24,6 +24,10 @@ def build_parser():
         if name == 'propose-regions': q.add_argument('--colors', type=int, required=True)
         if name == 'cfvx-draft':
             q.add_argument('--colors', type=int, default=22); q.add_argument('--tolerance', type=float, default=.65)
+    q = sub.add_parser('mosaic-draft'); q.add_argument('input'); q.add_argument('--out', required=True)
+    q.add_argument('--frame', type=int); q.add_argument('--colors', type=int, default=22)
+    q.add_argument('--from-labels'); q.add_argument('--mode', choices=('pixel', 'polygon', 'curve'), default='polygon')
+    q.add_argument('--tolerance', type=float, default=.5)
     q = sub.add_parser('inspect-svg'); q.add_argument('svg'); q.add_argument('--out', required=True)
     for name in ('render', '_render-worker'):
         q = sub.add_parser(name); q.add_argument('svg'); q.add_argument('--out', required=True)
@@ -95,6 +99,13 @@ def main(argv=None):
                 result = {'status': 'indeterminate', 'candidate_exists': False, 'run_directory': str(stage),
                           'reason': 'CFVX exceeded 180 second budget; no complete candidate claimed; inspect this run directory'}
             save_json(out/'draft-status.json', result)
+            emit(result)
+            return 0 if result.get('candidate_exists') else 3
+        elif args.command == 'mosaic-draft':
+            from r2v_lib.mosaic import mosaic_draft
+            result = mosaic_draft(
+                args.input, args.out, args.colors, args.from_labels, args.mode, args.frame, args.tolerance,
+            )
             emit(result)
             return 0 if result.get('candidate_exists') else 3
         elif args.command == 'check':

@@ -13,6 +13,10 @@ sys.path.insert(0, str(ROOT/'scripts'))
 import numpy as np
 from PIL import Image, ImageCms
 from r2v_lib.images import analyze, compare, load_image, propose
+from r2v_lib.mosaic.compose import compose_svg, reversal_pairs_match, shared_boundary_json, shared_coord_text
+from r2v_lib.mosaic.faces import area_matches_pixels, build_from_labels, rasterize_faces
+from r2v_lib.mosaic.fit import fit_graph, oriented
+from r2v_lib.mosaic.graph import contour_points
 from r2v_lib.svg import inspect, path_segments
 from r2v_lib.render import render
 
@@ -156,6 +160,156 @@ class Helpers(unittest.TestCase):
         from r2v_lib.processes import run_bounded
         with self.assertRaises(subprocess.TimeoutExpired):
             run_bounded([sys.executable,'-c','import time; time.sleep(10)'],timeout=.2)
+
+
+class Mosaic(unittest.TestCase):
+    def check_map(self, labels, *, nodes=None, segments=None, rings=None):
+        labels = np.asarray(labels, dtype=np.int32)
+        graph, faces = build_from_labels(labels)
+        self.assertTrue(area_matches_pixels(graph, faces, labels))
+        recon = rasterize_faces(graph, faces)
+        np.testing.assert_array_equal(recon, labels)
+        if nodes is not None:
+            self.assertEqual(len(graph.nodes), nodes)
+        if segments is not None:
+            self.assertEqual(len(graph.segments), segments)
+        if rings is not None:
+            self.assertEqual(sum(1 for seg in graph.segments if seg.is_ring), rings)
+        fitted = fit_graph(graph, 'pixel')
+        self.assertTrue(reversal_pairs_match(graph, faces, fitted))
+        return graph, faces, fitted
+
+    def test_single_pixel_ring(self):
+        graph, faces, _ = self.check_map([[0]], nodes=0, segments=1, rings=1)
+        self.assertEqual(list(faces), [0])
+
+    def test_full_image_ring(self):
+        self.check_map([[0, 0], [0, 0]], nodes=0, segments=1, rings=1)
+
+    def test_vertical_split(self):
+        graph, faces, fitted = self.check_map([[0, 1]], nodes=2, segments=3, rings=0)
+        shared = [i for i, seg in enumerate(graph.segments) if {seg.left, seg.right} == {0, 1}]
+        self.assertEqual(len(shared), 1)
+        sid = shared[0]
+        self.assertEqual(shared_coord_text(fitted[sid], True), '1 0 1 1')
+        self.assertEqual(shared_coord_text(fitted[sid], False), '1 1 1 0')
+        self.assertEqual(shared_coord_text(oriented(fitted[sid], False), True), '1 1 1 0')
+
+    def test_t_junction(self):
+        graph, faces, _ = self.check_map([[0, 0], [1, 2]])
+        interior = [n for n in graph.nodes if (n.x, n.y) == (1, 1)]
+        self.assertEqual(len(interior), 1)
+        self.assertEqual(set(faces), {0, 1, 2})
+
+    def test_checkerboard_pinch(self):
+        graph, faces, _ = self.check_map([[0, 1], [1, 0]])
+        pinch = [n for n in graph.nodes if (n.x, n.y) == (1, 1)]
+        self.assertEqual(len(pinch), 1)
+        self.assertEqual(sum(1 for d in pinch[0].out if d is not None), 4)
+        for region, contours in faces.items():
+            pts = contour_points(graph, contours[0])
+            self.assertGreaterEqual(pts.count((1, 1)), 2)
+
+    def test_nested_rings(self):
+        labels = [
+            [0, 0, 0, 0, 0],
+            [0, 1, 1, 1, 0],
+            [0, 1, 2, 1, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 0, 0, 0],
+        ]
+        graph, faces, fitted = self.check_map(labels, nodes=0, segments=3, rings=3)
+        self.assertEqual(len(faces[0]), 2)
+        self.assertEqual(len(faces[1]), 2)
+        self.assertEqual(len(faces[2]), 1)
+        hole = graph.segments[2]
+        self.assertEqual(shared_coord_text(fitted[2], True), shared_coord_text(oriented(fitted[2], False), False))
+        self.assertNotEqual(hole.left, hole.right)
+
+    def test_border_touching_and_corridor(self):
+        self.check_map([[-1, 0, 0], [-1, 0, -1]], rings=1)
+        self.check_map([
+            [0, 0, 0, 0],
+            [0, 1, 1, 0],
+            [0, 1, 0, 0],
+            [0, 0, 0, 0],
+        ])
+
+    def test_polygon_keeps_endpoints(self):
+        labels = np.array([[0, 1, 1], [0, 0, 1]], dtype=np.int32)
+        graph, faces = build_from_labels(labels)
+        fitted = fit_graph(graph, 'polygon', 0.5)
+        for seg, geom in zip(graph.segments, fitted):
+            if seg.is_ring:
+                continue
+            self.assertEqual(geom.start, (float(seg.points[0][0]), float(seg.points[0][1])))
+            self.assertEqual(geom.end, (float(seg.points[-1][0]), float(seg.points[-1][1])))
+        self.assertTrue(reversal_pairs_match(graph, faces, fitted))
+
+    def test_svg_shared_numbers_and_inspect(self):
+        labels = np.array([[0, 1]], dtype=np.int32)
+        graph, faces, fitted = self.check_map(labels)
+        svg = compose_svg(graph, faces, fitted, {0: (196, 53, 77, 255), 1: (36, 105, 200, 255)})
+        self.assertIn('fill-rule="nonzero"', svg)
+        self.assertIn('L1 1', svg)
+        self.assertIn('L1 0', svg)
+        temp = tempfile.TemporaryDirectory()
+        path = Path(temp.name) / 'm.svg'
+        path.write_text(svg, encoding='utf-8')
+        self.assertEqual(inspect(str(path))[0]['status'], 'passed')
+        payload = shared_boundary_json(graph, faces, fitted, {0: (196, 53, 77), 1: (36, 105, 200)})
+        edge = next(v for v in payload['edges'].values() if {v['left'], v['right']} == {0, 1})
+        self.assertEqual(edge['forward_d'], 'M1 0L1 1')
+        self.assertEqual(edge['reverse_d'], 'M1 1L1 0')
+        temp.cleanup()
+
+    def test_cli_pixel_round_trip(self):
+        temp = tempfile.TemporaryDirectory(prefix='mosaic ')
+        folder = Path(temp.name)
+        src = folder / 'in.png'
+        arr = np.zeros((4, 6, 4), dtype=np.uint8)
+        arr[:, :, :3] = (40, 80, 120)
+        arr[:, :, 3] = 255
+        arr[:, 3:, :3] = (200, 30, 70)
+        Image.fromarray(arr).save(src)
+        labels = np.zeros((4, 6), dtype=np.int32)
+        labels[:, 3:] = 1
+        np.save(folder / 'labels.npy', labels)
+        out = folder / 'out'
+        run = subprocess.run(
+            [sys.executable, str(ROOT / 'scripts/r2v.py'), 'mosaic-draft', str(src),
+             '--out', str(out), '--from-labels', str(folder / 'labels.npy'), '--mode', 'pixel'],
+            capture_output=True, text=True, encoding='utf-8',
+        )
+        self.assertEqual(run.returncode, 0, run.stderr)
+        status = json.loads(run.stdout)
+        self.assertEqual(status['status'], 'draft_only')
+        self.assertEqual(status['quality_status'], 'indeterminate')
+        self.assertTrue(status['pixel_round_trip'])
+        self.assertTrue(status['area_matches_pixels'])
+        self.assertTrue((out / 'candidate.svg').is_file())
+        self.assertTrue((out / 'shared-boundary.json').is_file())
+        self.assertEqual(inspect(str(out / 'candidate.svg'))[0]['status'], 'passed')
+        temp.cleanup()
+
+    def test_curve_mode_pins_and_inspects(self):
+        labels = np.zeros((8, 8), dtype=np.int32)
+        yy, xx = np.ogrid[:8, :8]
+        labels[(xx - 3.5) ** 2 + (yy - 3.5) ** 2 <= 9] = 1
+        graph, faces = build_from_labels(labels)
+        fitted = fit_graph(graph, 'curve', 0.5)
+        for seg, geom in zip(graph.segments, fitted):
+            if seg.is_ring:
+                continue
+            self.assertEqual(geom.start, (float(seg.points[0][0]), float(seg.points[0][1])))
+            self.assertEqual(geom.end, (float(seg.points[-1][0]), float(seg.points[-1][1])))
+        self.assertTrue(reversal_pairs_match(graph, faces, fitted))
+        svg = compose_svg(graph, faces, fitted, {0: (200, 200, 200, 255), 1: (30, 80, 180, 255)})
+        temp = tempfile.TemporaryDirectory()
+        path = Path(temp.name) / 'c.svg'
+        path.write_text(svg, encoding='utf-8')
+        self.assertEqual(inspect(str(path))[0]['status'], 'passed')
+        temp.cleanup()
 
 
 if __name__=='__main__': unittest.main()
