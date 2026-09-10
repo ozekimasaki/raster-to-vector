@@ -136,6 +136,7 @@ def propose(path, out, colors, frame=None):
         result[:, :, :3][alpha > 0] = palette[idx]
     else:
         palette = np.empty((0, 3), dtype=np.uint8); stride = 1
+        quantizer = 'none'
         result = np.zeros_like(arr)
     Image.fromarray(result).save(out / 'regions.png')
     Image.fromarray(alpha).save(out / 'alpha.png')

@@ -142,6 +142,7 @@ def mosaic_draft(
         limitations.append('curve mode fell back to polygon on one or more segments (CFV-X unavailable or error budget)')
     if int(despeckle) > 0:
         limitations.append('despeckle removes isolated-pixel speckle; pixels in 1px strokes keep >=2 same-label neighbors and survive; N>=3 can erode diagonal single-pixel strokes')
+        limitations.append('despeckle never relabels transparent (OUTSIDE) cells nor relabels a cell to transparent; speckles fully surrounded by transparency survive')
 
     hints = []
     if not int(despeckle) and speckle_frac > 0.003:
