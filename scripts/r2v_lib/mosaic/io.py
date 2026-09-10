@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image
 
 from ..images import load_image, propose, save_json
+from .clean import despeckle_labels, isolated_fraction
 from .compose import compose_svg, reversal_pairs_match, shared_boundary_json
 from .faces import area_matches_pixels, build_from_labels, rasterize_faces
 from .fit import DEFAULT_TAU, fit_graph
@@ -55,6 +56,8 @@ def mosaic_draft(
     mode: str = 'polygon',
     frame: int | None = None,
     tolerance: float = DEFAULT_TAU,
+    despeckle: int = 0,
+    palette=None,
 ) -> dict:
     if mode not in ('pixel', 'polygon', 'curve'):
         raise ValueError('mode must be pixel, polygon, or curve')
@@ -62,11 +65,14 @@ def mosaic_draft(
         raise ValueError('--colors must be 2..256')
     if not 0 < float(tolerance) <= 10:
         raise ValueError('--tolerance must be in (0, 10]')
+    if not 0 <= int(despeckle) <= 8:
+        raise ValueError('--despeckle must be in [0, 8]')
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     im, meta = load_image(source, frame)
     rgba = np.asarray(im)
     generated_labels = False
+    limitations_extra = []
     if from_labels is not None:
         labels = load_labels(from_labels)
         if labels.shape != rgba.shape[:2]:
@@ -74,16 +80,21 @@ def mosaic_draft(
                 f'Label map {labels.shape} does not match image {(rgba.shape[0], rgba.shape[1])}'
             )
         paints = palette_from_image(rgba, labels)
-        palette_path = Path(from_labels).resolve().parent / 'palette.json'
+        palette_path = Path(palette) if palette else Path(from_labels).resolve().parent / 'palette.json'
         if palette_path.is_file():
             import json
             extra = json.loads(palette_path.read_text(encoding='utf-8'))
             proposed = palette_from_propose(extra)
             if proposed:
-                paints.update(proposed)
-                for rid, rgb in list(paints.items()):
-                    if rid in proposed and len(rgb) > 3:
-                        paints[rid] = (*proposed[rid][:3], rgb[3])
+                needed = int(labels.max()) + 1 if labels.size else 0
+                if len(proposed) != needed:
+                    limitations_extra.append(
+                        f'palette file has {len(proposed)} entries but label ids need {needed}; '
+                        'check it was written for this label map'
+                    )
+                for rid in proposed:
+                    if rid in paints:
+                        paints[rid] = (*proposed[rid][:3], paints[rid][3])
     else:
         propose_meta = propose(source, out, int(colors), frame)
         labels = load_labels(out / 'labels.npy')
@@ -95,6 +106,13 @@ def mosaic_draft(
                 paints[rid] = rgba_mean
         generated_labels = True
         meta = propose_meta
+
+    speckle_px, speckle_frac = isolated_fraction(labels)
+    despeckled_px = 0
+    if int(despeckle) > 0:
+        labels, despeckled_px = despeckle_labels(labels, int(despeckle))
+        used = set(np.unique(labels).tolist())
+        paints = {rid: p for rid, p in paints.items() if rid in used}
 
     graph, faces = build_from_labels(labels)
     fitted = fit_graph(graph, mode, float(tolerance))
@@ -119,9 +137,17 @@ def mosaic_draft(
         'Geometric partition does not remove renderer AA hairlines',
         '4-neighborhood crack boundaries; diagonal contact is pinched at a node',
         'Small regions are not removed by area',
-    ]
+    ] + limitations_extra
     if curve_fallback:
         limitations.append('curve mode fell back to polygon on one or more segments (CFV-X unavailable or error budget)')
+    if int(despeckle) > 0:
+        limitations.append('despeckle removes isolated-pixel speckle; pixels in 1px strokes keep >=2 same-label neighbors and survive; N>=3 can erode diagonal single-pixel strokes')
+
+    hints = []
+    if not int(despeckle) and speckle_frac > 0.003:
+        hints.append(f'{speckle_px} speckle pixels ({speckle_frac:.2%}) in labels; --despeckle 2 removes them without eroding thin strokes')
+    if int(despeckle) > 0 and float(tolerance) > 0.6:
+        hints.append('cleaned boundaries track closely at --tolerance 0.4-0.6; larger values only add deviation budget')
 
     result = {
         'status': 'draft_only',
@@ -130,6 +156,10 @@ def mosaic_draft(
         'mode': mode if not curve_fallback else 'polygon',
         'requested_mode': mode,
         'tolerance': float(tolerance),
+        'despeckle': int(despeckle),
+        'despeckled_pixels': despeckled_px,
+        'isolated_speckle_pixels': speckle_px,
+        'isolated_speckle_fraction': speckle_frac,
         'width': graph.width,
         'height': graph.height,
         'node_count': len(graph.nodes),
@@ -141,6 +171,7 @@ def mosaic_draft(
         'pixel_round_trip': round_trip if round_trip_checked else None,
         'quality_status': 'indeterminate',
         'limitations': limitations,
+        'hints': hints,
     }
     save_json(out / 'draft-status.json', result)
     return result

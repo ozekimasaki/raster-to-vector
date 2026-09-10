@@ -26,8 +26,9 @@ def build_parser():
             q.add_argument('--colors', type=int, default=22); q.add_argument('--tolerance', type=float, default=.65)
     q = sub.add_parser('mosaic-draft'); q.add_argument('input'); q.add_argument('--out', required=True)
     q.add_argument('--frame', type=int); q.add_argument('--colors', type=int, default=22)
-    q.add_argument('--from-labels'); q.add_argument('--mode', choices=('pixel', 'polygon', 'curve'), default='polygon')
-    q.add_argument('--tolerance', type=float, default=.5)
+    q.add_argument('--from-labels'); q.add_argument('--palette')
+    q.add_argument('--mode', choices=('pixel', 'polygon', 'curve'), default='polygon')
+    q.add_argument('--tolerance', type=float, default=.5); q.add_argument('--despeckle', type=int, default=0)
     q = sub.add_parser('inspect-svg'); q.add_argument('svg'); q.add_argument('--out', required=True)
     for name in ('render', '_render-worker'):
         q = sub.add_parser(name); q.add_argument('svg'); q.add_argument('--out', required=True)
@@ -105,6 +106,7 @@ def main(argv=None):
             from r2v_lib.mosaic import mosaic_draft
             result = mosaic_draft(
                 args.input, args.out, args.colors, args.from_labels, args.mode, args.frame, args.tolerance,
+                args.despeckle, args.palette,
             )
             emit(result)
             return 0 if result.get('candidate_exists') else 3

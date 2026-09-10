@@ -91,6 +91,7 @@ python "SKILL_ROOT/scripts/r2v.py" cfvx-draft "input.png" --out "work/draft"
 ```
 
 `mosaic-draft` は格子上の共有辺を一度だけ fit する。領域ごとの独立トレースではない。完成出力ではなく `draft-status.json` を読む。
+内部の `--colors` 量子化は彩度層別で少数アクセント色の枠を保つ。ラベルがノイズまみれのときは `isolated_speckle_fraction` と `hints` を見て `--despeckle 2` を検討する（1px 線を侵食しない）。`--from-labels` では同階層の `palette.json` が暗黙に読まれるため、別ラベル用のパレットが残っていると静かに色違いになる。`--palette` で明示できる。
 CFV-Xは素材alphaの切り捨て、小領域除去、輪郭下への膨張を含む。
 共有境界やWVR 2を満たす完成出力ではない。既存CFV-Xの `overall: passed` を最終合格として引用しない。
 

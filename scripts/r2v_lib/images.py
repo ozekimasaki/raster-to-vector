@@ -88,6 +88,18 @@ def analyze(path, out, frame=None):
     return meta
 
 
+def _median_cut_palette(sampled, n_colors):
+    if len(sampled) <= n_colors:
+        return np.unique(sampled, axis=0)
+    quant = Image.fromarray(sampled.reshape(1, -1, 3)).quantize(colors=n_colors, method=Image.Quantize.MEDIANCUT,
+                                                              dither=Image.Dither.NONE)
+    palette = np.array(quant.getpalette(), dtype=np.uint8).reshape(-1, 3)
+    return palette[np.unique(np.asarray(quant))]
+
+
+SATURATION_STRATUM_MIN = 48
+
+
 def propose(path, out, colors, frame=None):
     if not 2 <= colors <= 256:
         raise ValueError('--colors must be 2..256')
@@ -100,11 +112,19 @@ def propose(path, out, colors, frame=None):
         # Deterministic subsample; hidden RGB is excluded and alpha never quantized.
         stride = max(1, int(np.ceil(len(pixels) / 250000)))
         sampled = pixels[::stride]
-        quant = Image.fromarray(sampled.reshape(1, -1, 3)).quantize(colors=colors, method=Image.Quantize.MEDIANCUT,
-                                                                  dither=Image.Dither.NONE)
-        palette = np.array(quant.getpalette(), dtype=np.uint8).reshape(-1, 3)
-        used = np.unique(np.asarray(quant))
-        palette = palette[used]
+        # Volume-proportional median cut lets a dominant flat background absorb
+        # most palette slots; a small saturated stratum gets a floor share so
+        # rare accent colors survive.
+        quantizer = 'median_cut'
+        sat = sampled.astype(np.int16).max(axis=1) - sampled.min(axis=1)
+        vivid = sat >= SATURATION_STRATUM_MIN
+        if colors >= 8 and int(vivid.sum()) >= 64 and int((~vivid).sum()) >= 64:
+            n_vivid = max(4, min(colors - 4, int(np.ceil(colors * 0.35))))
+            palette = np.vstack([_median_cut_palette(sampled[vivid], n_vivid),
+                                 _median_cut_palette(sampled[~vivid], colors - n_vivid)])
+            quantizer = 'stratified_saturation'
+        else:
+            palette = _median_cut_palette(sampled, colors)
         # Explicit nearest RGB mapping, chunked to avoid H*W*K allocation.
         idx = np.empty(len(pixels), dtype=np.int16)
         p = palette.astype(np.float32)
@@ -121,7 +141,7 @@ def propose(path, out, colors, frame=None):
     Image.fromarray(alpha).save(out / 'alpha.png')
     np.save(out / 'labels.npy', labels, allow_pickle=False)
     meta.update(requested_colors=colors, palette_rgb=palette.tolist(), sample_stride=stride,
-                alpha_policy='unchanged_separate_channel', dither=False, resized=False,
+                quantizer=quantizer, alpha_policy='unchanged_separate_channel', dither=False, resized=False,
                 status='proposal_only', note='Color labels are not connected components or a shared boundary graph')
     save_json(out / 'palette.json', meta)
     return meta
